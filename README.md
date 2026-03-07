@@ -1,4 +1,4 @@
-# v_m_p_1
+# 1
 
 PS C:\Users\admin\Desktop\v_m_p_practice1> docker --version
 Docker version 29.2.1, build a5c7197
@@ -21,5 +21,17 @@ t you are currently reading.
 
 ## Student
 
-- Name:Горбань Анастасія
-- Group: 232.1
+ Name:Горбань Анастасія
+ Group: 232.1
+
+## 3
+
+PS C:\Users\admin\Desktop\v_m_p_practice1\v_m_p_1> docker compose run --rm npm npm -v
+Container v_m_p_1-npm-run-641223e148a5 Creating
+Container v_m_p_1-npm-run-641223e148a5 Created
+11.11.0
+PS C:\Users\admin\Desktop\v_m_p_practice1\v_m_p_1> docker compose run --rm npm node --version
+Container v_m_p_1-npm-run-1d02a6419537 Creating
+Container v_m_p_1-npm-run-1d02a6419537 Created
+v25.8.0
+PS C:\Users\admin\Desktop\v_m_p_practice1\v_m_p_1>
