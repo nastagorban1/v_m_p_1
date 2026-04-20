@@ -1,3 +1,93 @@
+## Student
+- Name: Горбань Анастасія Сергіївна
+- Group: 232.1
+
+## Практичне заняття №3 — CRUD REST API для MiniShop
+
+### Структура репозиторію
+.
+├── src/
+│ ├── categories/
+│ │ ├── category.entity.ts
+│ │ ├── categories.module.ts
+│ │ ├── categories.service.ts
+│ │ └── categories.controller.ts
+│ ├── products/
+│ │ ├── product.entity.ts
+│ │ ├── products.module.ts
+│ │ ├── products.service.ts
+│ │ └── products.controller.ts
+│ ├── migrations/
+│ │ ├── 1700000001-CreateTables.ts
+│ │ └── <timestamp>-AddIsActiveToProducts.ts
+│ ├── data-source.ts
+│ └── app.module.ts
+├── Dockerfile
+├── docker-compose.yml
+└── README.md
+
+
+### Запуск проекту
+
+cp .env.example .env
+docker compose up --build
+
+
+### API Endpoints
+| Method | URL | Опис |
+|--------|-----|------|
+| GET | /api/categories | Список категорій |
+| GET | /api/categories/:id | Одна категорія |
+| POST | /api/categories | Створити категорію |
+| PATCH | /api/categories/:id | Оновити категорію |
+| DELETE | /api/categories/:id | Видалити категорію |
+| GET | /api/products | Список продуктів |
+| GET | /api/products/:id | Один продукт |
+| POST | /api/products | Створити продукт |
+| PATCH | /api/products/:id | Оновити продукт |
+| DELETE | /api/products/:id | Видалити продукт |
+
+### Тест створення категорії
+
+PS C:\Users\admin\Desktop\v_m_p_practice1\v_m_p_1> docker compose exec postgres psql -U nestuser -d nestdb -c "\dt"
+           List of relations
+ Schema |    Name    | Type  |  Owner   
+--------+------------+-------+----------
+ public | categories | table | nestuser
+ public | migrations | table | nestuser
+ public | products   | table | nestuser
+
+
+"
+
+### Тест створення продукту
+
+
+StatusCode        : 200
+StatusDescription : OK
+Content           : [{"id":1,"isActive":true,"name":"iPhone","de
+                    scription":null,"price":"999.00","stock":0,"
+                    category":{"id":1,"name":"Electronics","desc
+                    ription":null,"createdAt":"2026-04-08T21:50:
+                    32.186Z"},"createdAt":"2..}]
+
+### Тест 404
+
+ C:\Users\admin\Desktop\v_m_p_practice1\v_m_p_1> curl http://localhost:3000/api/products/999
+curl : {"message":"Product #999 not found","error":"Not Found","
+statusCode":404}
+
+
+
+
+
+
+
+
+
+
+
+
 ВПРАВА 1
 Горбань Анастасія Сергіївна 232.1
 Практична 2
