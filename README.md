@@ -1,5 +1,92 @@
 ## Student
 - Name: Горбань Анастасія Сергіївна
+- 232.1
+
+## Практичне заняття №4 — DTO + class-validator + Pipes
+
+### Структура репозиторію
+```
+.
+├── src/
+│   ├── categories/
+│   │   ├── dto/
+│   │   │   ├── create-category.dto.ts
+│   │   │   └── update-category.dto.ts
+│   │   ├── category.entity.ts
+│   │   ├── categories.module.ts
+│   │   ├── categories.service.ts
+│   │   └── categories.controller.ts
+│   ├── products/
+│   │   ├── dto/
+│   │   │   ├── create-product.dto.ts
+│   │   │   └── update-product.dto.ts
+│   │   ├── product.entity.ts
+│   │   ├── products.module.ts
+│   │   ├── products.service.ts
+│   │   └── products.controller.ts
+│   ├── common/
+│   │   └── pipes/
+│   │   	└── trim.pipe.ts
+│   ├── migrations/
+│   ├── data-source.ts
+│   ├── main.ts
+│   └── app.module.ts
+├── Dockerfile
+├── docker-compose.yml
+└── README.md
+```
+ 
+### Запуск проекту
+```bash
+cp .env.example .env
+docker compose up --build
+
+### тести валідації
+
+
+curl.exe -X POST "http://localhost:3000/api/categories" `
+>> -H "Content-Type: application/json" `
+>> -d "{\"name\":\"\"}"
+{"message":"Expected property name or '}' in JSON at position 1","error":"Bad Request","statusCode":400}curl: (3) URL rejected: Port number was not a decimal number between 0 and 65535
+PS C:\Users\admin\Desktop\v_m_p_practice1\v_m_p_1> 
+
+
+ curl.exe -X POST "http://localhost:3000/api/categories" `
+>> -H "Content-Type: application/json" `
+>> -d "{\"name\":\"Test\",\"isAdmin\":true}"
+{"message":"Expected property name or '}' in JSON at position 1","error":"Bad Request","statusCode":400curl: (3) unmatched close brace/bracket in URL position 28:
+name\:\Test\,\isAdmin\:true
+                      
+
+
+curl.exe -X POST http://localhost:3000/api/products ^-H "Content-Type: application/json" ^-d "{\"name\":\"iPhone 16\",\"price\":999.99,\"stock\":10,\"categoryId\":1}"
+{"message":["name must be shorter than or equal to 255 characters","name must be longer than or equal to 2 characters","name must be a string","price must not be less than 0.01","price must be a number conforming to the specified constraints"],"error":"Bad Request","statusCode":400}curl: (3) URL rejected: Bad hostname
+
+
+
+curl.exe -X POST "http://localhost:3000/api/products" `
+>> -H "Content-Type: application/json" `
+>> -d "{\"name\":\"Bad\",\"price\":-5}"
+{"message":"Expected property name or '}' in JSON at position 1","error":"Bad Request","statusCode":400curl: (3) unmatched close brace/bracket in URL position 23:
+name\:\Bad\,\price\:-5
+
+
+curl.exe -X POST "http://localhost:3000/api/categories" `
+>> -H "Content-Type: application/json" `
+>> -d "{\"name\":\"   Accessories   \"}"
+{"message":"Expected property name or '}' in JSON at position 1","error":"Bad Request","statusCode":400}curl: (3) URL rejected: Port number was not a decimal number between 0 and 65535
+curl: (6) Could not resolve host: Accessories
+curl: (3) URL rejected: Bad hostname
+
+
+
+
+
+
+
+
+## Student
+- Name: Горбань Анастасія Сергіївна
 - Group: 232.1
 
 ## Практичне заняття №3 — CRUD REST API для MiniShop
