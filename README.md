@@ -1,3 +1,273 @@
+
+
+## Student
+- Name: Горбань Анастасія Сергіївна
+- 232.1
+
+## Практичне заняття №5 — JWT Authentication + Guards + RBAC
+
+├── src/
+│ ├── auth/
+│ │ ├── dto/
+│ │ │ ├── register.dto.ts
+│ │ │ └── login.dto.ts
+│ │ ├── auth.module.ts
+│ │ ├── auth.service.ts
+│ │ └── auth.controller.ts
+│ ├── users/
+│ │ ├── user.entity.ts
+│ │ ├── users.module.ts
+│ │ └── users.service.ts
+│ ├── common/
+│ │ ├── enums/
+│ │ │ └── role.enum.ts
+│ │ ├── guards/
+│ │ │ ├── jwt-auth.guard.ts
+│ │ │ └── roles.guard.ts
+│ │ ├── decorators/
+│ │ │ ├── current-user.decorator.ts
+│ │ │ └── roles.decorator.ts
+│ │ └── pipes/
+│ │ └── trim.pipe.ts
+│ ├── categories/
+│ ├── products/
+│ ├── migrations/
+│ ├── data-source.ts
+│ ├── main.ts
+│ └── app.module.ts
+├── Dockerfile
+├── docker-compose.yml
+└── README.md
+
+
+
+docker compose up --build -d
+time="2026-05-12T21:03:04+03:00" level=warning msg="project has been loaded without an explicit name from a symlink. Using name \"v_M_P_1\""
+#1 [internal] load local bake definitions
+#1 reading from stdin 543B 0.0s done
+#1 DONE 0.0s
+
+#2 [internal] load build definition from Dockerfile
+#2 transferring dockerfile: 253B 0.0s done
+#2 DONE 0.1s
+
+#3 [internal] load metadata for docker.io/library/node:20-alpine
+#3 ...
+
+#4 [auth] library/node:pull token for registry-1.docker.io
+#4 DONE 0.0s
+
+#3 [internal] load metadata for docker.io/library/node:20-alpine
+#3 DONE 1.3s
+
+#5 [internal] load .dockerignore
+#5 transferring context: 2B done
+#5 DONE 0.0s
+
+#6 [1/6] FROM docker.io/library/node:20-alpine@sha256:fb4cd12c85ee03686f6af5362a0b0d56d50c58a04632e6c0fb8363f609372293
+#6 resolve docker.io/library/node:20-alpine@sha256:fb4cd12c85ee03686f6af5362a0b0d56d50c58a04632e6c0fb8363f609372293 0.0s done
+#6 DONE 0.1s
+
+#7 [internal] load build context
+#7 transferring context: 3.39MB 2.9s done
+#7 DONE 3.1s
+
+#8 [2/6] RUN npm install -g @nestjs/cli
+#8 CACHED
+
+#9 [3/6] WORKDIR /app
+#9 CACHED
+
+#10 [4/6] COPY package*.json ./
+#10 CACHED
+
+#11 [5/6] RUN npm install --ignore-scripts 2>/dev/null || true
+#11 CACHED
+
+#12 [6/6] COPY . .
+#12 DONE 42.7s
+
+#13 exporting to image
+#13 exporting layers
+#13 exporting layers 16.8s done
+#13 exporting manifest sha256:7f3bde402ffbf3fc3c50193141ed037f58fa8c52e8a093450ca2c564ec4609f9 0.0s done
+#13 exporting config sha256:803b6bd59eeba5c714befdc6a658e33a6a8b1194a22721c440f2920733e5e721 0.0s done
+#13 exporting attestation manifest sha256:012fc59f94112e9a46c788dff02524a94f188222da98ddfe9a10e75aa244f54a 0.1s done
+#13 exporting manifest list sha256:3fce80266e50f6e544cbf1c218ff998de18130ba816e2804926875e1e5a36143
+#13 exporting manifest list sha256:3fce80266e50f6e544cbf1c218ff998de18130ba816e2804926875e1e5a36143 0.0s done
+#13 naming to docker.io/library/v_m_p_1-app:latest done
+#13 unpacking to docker.io/library/v_m_p_1-app:latest
+#13 unpacking to docker.io/library/v_m_p_1-app:latest 14.6s done
+#13 DONE 31.7s
+
+#14 resolving provenance for metadata file
+#14 DONE 0.1s
+time="2026-05-12T21:04:25+03:00" level=warning msg="Found orphan containers ([v_m_p_1-npm-1]) for this project. If you removed or renamed this service in your compose file, you can run this command with the --remove-orphans flag to clean it up."
+[+] up 4/4
+ ✔ Image v_m_p_1-app            Built                                              80.5s
+ ✔ Container v_m_p_1-redis-1    Healthy                                            7.2s
+ ✔ Container v_m_p_1-postgres-1 Healthy                                            7.2s
+ ✔ Container v_m_p_1-app-1      Recreated      
+
+
+##  API Endpoints
+
+| Method | URL | Auth | Role |
+|--------|-----|------|------|
+| POST | /auth/register | - | - |
+| POST | /auth/login | - | - |
+| GET | /api/categories | - | - |
+| POST | /api/categories | JWT | admin |
+| GET | /api/products | - | - |
+| POST | /api/products | JWT | admin |
+| PATCH | /api/products/:id | JWT | admin |
+| DELETE | /api/products/:id | JWT | admin |
+
+
+PS C:\Users\admin\Desktop\v_m_p_practice1\v_M_P_1> docker compose exec postgres psql -U nestuser -d nestdb -c "\d users"
+time="2026-05-12T18:37:22+03:00" level=warning msg="project has been loaded without an explicit name from a symlink. Using name \"v_M_P_1\""
+                                         Table "public.users"
+    Column    |            Type             | Collation | Nullable |              Default              
+--------------+-----------------------------+-----------+----------+-----------------------------------
+ id           | integer                     |           | not null | nextval('users_id_seq'::regclass)
+ email        | character varying           |           | not null | 
+ passwordHash | character varying           |           | not null | 
+ name         | character varying           |           |          | 
+ role         | users_role_enum             |           | not null | 'user'::users_role_enum
+ createdAt    | timestamp without time zone |           | not null | now()
+Indexes:
+--More-- 
+
+## 1. Реєстрація нового користувача:
+
+
+PS C:\Users\admin\Desktop\v_m_p_practice1\v_M_P_1> Invoke-RestMethod -Uri "http://localhost:3000/auth/register" -Method POST -ContentType "application/json" -Body '{"email":"user@test.com","password":"12345678","name":"Test"}'
+
+
+id        : 1
+email     : user@test.com
+name      : Test
+role      : user
+createdAt : 2026-05-12T16:34:22.716Z
+
+
+## 2. Повторна реєстрація (дубль email):
+
+PS C:\Users\admin\Desktop\v_m_p_practice1\v_M_P_1> Invoke-RestMethod -Uri "http://localhost:3000/auth/register" -Method POST -ContentType "application/json" -Body '{"email":"user@test.com","password":"12345678","name":"Test"}'
+Invoke-RestMethod : {"message":"User already exists","error":
+"Conflict","statusCode":409}
+At line:1 char:1
++ Invoke-RestMethod -Uri "http://localhost:3000/auth/register
+" -Method  ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~
+    + CategoryInfo          : InvalidOperation: (System.Net. 
+   HttpWebRequest:HttpWebRequest) [Invoke-RestMethod], WebE  
+  xception
+    + FullyQualifiedErrorId : WebCmdletWebResponseException, 
+   Microsoft.PowerShell.Commands.InvokeRestMethodCommand
+
+
+## 3. Логін і збереження токену : 
+ 
+PS C:\Users\admin\Desktop\v_m_p_practice1\v_M_P_1> $response = Invoke-RestMethod -Uri "http://localhost:3000/auth/login" -Method POST -ContentType "application/json" -Body '{"email":"user@test.com","password":"12345678"}'
+PS C:\Users\admin\Desktop\v_m_p_practice1\v_M_P_1> $userToken = $response.accessToken
+PS C:\Users\admin\Desktop\v_m_p_practice1\v_M_P_1> $userToken
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImVtYWlsIjoidXNlckB0ZXN0LmNvbSIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNzc4NjA3MDY4LCJleHAiOjE3Nzg2MTA2Njh9.82pYppS0DBkATtA76-WWfSnFgzmabSAxGRlxkSqCDao
+PS C:\Users\admin\Desktop\v_m_p_practice1\v_M_P_1> 
+
+
+## 4. Невірний пароль:
+
+PS C:\Users\admin\Desktop\v_m_p_practice1\v_M_P_1> Invoke-RestMethod -Uri "http://localhost:3000/auth/login" -Method POST -ContentType "application/json" -Body '{"email":"user@test.com","password":"securepass123"}'
+Invoke-RestMethod : {"message":"Invalid credentials","error":
+"Unauthorized","statusCode":401}
+At line:1 char:1
++ Invoke-RestMethod -Uri "http://localhost:3000/auth/login" -
+Method POS ...
+
+
+GET без токена (публічний)
+
+S C:\Users\admin\Desktop\v_m_p_practice1\v_M_P_1> curl http://localhost:3000/api/products
+
+
+
+StatusCode        : 200
+StatusDescription : OK
+Content           : []
+RawContent        : HTTP/1.1 200 OK
+                    Connection: keep-alive
+                    Keep-Alive: timeout=5
+                    Content-Length: 2
+                    Content-Type: application/json; charset=u
+                    tf-8
+                    Date: Tue, 12 May 2026 17:41:29 GMT
+                    ETag: W/"2-l9Fw4VUO7kr8CvBlt4zaMC...
+Forms             : {}
+Headers           : {[Connection, keep-alive], [Keep-Alive, t
+                    imeout=5], [Content-Length, 2], [Content-
+                    Type, application/json; charset=utf-8]...
+                    }
+Images            : {}
+InputFields       : {}
+Links             : {}
+ParsedHtml        : System.__ComObject
+RawContentLength  : 2
+
+
+## POST без токена
+
+PS C:\Users\admin\Desktop\v_m_p_practice1\v_m_P_1> Invoke-RestMethod -Uri "http://localhost:3000/api/products" `
+>> -Method POST `
+>> -ContentType "application/json" `
+>> -Body '{"name":"Test","price":10}'
+Invoke-RestMethod : {"message":"No token","error":"Unauthorized","statusCode":401}
+At line:1 char:1
++ Invoke-RestMethod -Uri "http://localhost:3000/api/products" `
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : InvalidOperation: (System.Net.HttpWebRequest:HttpWebRequ 
+   est) [Invoke-RestMethod], WebException
+    + FullyQualifiedErrorId : WebCmdletWebResponseException,Microsoft.PowerShell.Comma 
+   nds.InvokeRestMethodCommand
+
+POST з токеном USER 
+
+PS C:\Users\admin\Desktop\v_m_p_practice1\v_m_P_1> Invoke-RestMethod -Uri "http://localhost:3000/api/products" `
+>> -Method POST `
+>> -Headers @{Authorization="Bearer $userToken"} `
+>> -ContentType "application/json" `
+>> -Body '{"name":"Blocked Product","price":99}'
+Invoke-RestMethod : {"message":"Insufficient permissions","error":"Forbidden","statusCo
+de":403}
+At line:1 char:1
++ Invoke-RestMethod -Uri "http://localhost:3000/api/products" `
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : InvalidOp
+
+ POST з токеном ADMIN:
+
+
+PS C:\Users\admin\Desktop\v_m_p_practice1\v_M_P_1> Invoke-RestMethod -Uri "http://localhost:3000/api/products" -Method POST -ContentType "application/json" -Headers @{Authorization="Bearer $adminToken"} -Body '{"name":"MacBook Pro","price":2499.99,"stock":10}'
+
+
+id          : 4
+isActive    : True
+name        : MacBook Pro
+description : 
+price       : 2499,99
+stock       : 10
+createdAt   : 2026-05-12T17:55:20.495Z
+updatedAt   : 2026-05-12T17:55:20.495Z
+
+
+
+
+
+
+
+
+
 ## Student
 - Name: Горбань Анастасія Сергіївна
 - 232.1
