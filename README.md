@@ -1,3 +1,116 @@
+## Student
+- Name: Горбань Анастасія Сергіївна
+- 232.1
+
+##  Практичне заняття №7 — Redis + Pagination + Filtering
+
+### Запуск проекту
+cp .env.example .env
+docker compose up --build
+docker compose run --rm app npm run seed
+
+### API: GET /api/products
+ 
+| Параметр | Тип | Default | Опис |
+|----------|-----|---------|------|
+| page | number | 1 | Номер сторінки |
+| pageSize | number | 10 | Елементів на сторінку (max 100) |
+| sort | string | createdAt | Поле сортування |
+| order | asc/desc | desc | Напрямок |
+| categoryId | number | - | Фільтр за категорією |
+| minPrice | number | - | Мінімальна ціна |
+| maxPrice | number | - | Максимальна ціна |
+| search | string | - | Пошук за назвою (ILIKE) |
+ 
+{"data":{"items":[{"id":7,"isActive":true,"name":"MacBook Air M4","description":null,"price":"1299.99","stock":5,"category":null,"createdAt":"2026-05-14T17:20:10.020Z","updatedAt":"2026-05-14T17:20:10.020Z"},{"id":6,"isActive":true,"name":"MacBook Air M4","description":null,"price":"1299.99","stock":5,"category":null,"createdAt":"2026-05-14T17:18:41.055Z","updatedAt":"2026-05-14T17:18:41.055Z"},{"id":5,"isActive":true,"name":"Test","description":null,"price":"10.00","stock":0,"category":null,"createdAt":"2026-05-12T18:36:50.267Z","updatedAt":"2026-05-12T18:36:50.267Z"},{"id":4,"isActive":true,"name":"MacBook Pro","description":null,"price":"2499.99","stock":10,"category":null,"createdAt":"2026-05-12T17:55:20.495Z","updatedAt":"2026-05-12T17:55:20.495Z"},{"id":3,"isActive":true,"name":"Blocked Product","description":null,"price":"99.00","stock":0,"category":null,"createdAt":"2026-05-12T17:53:06.743Z","updatedAt":"2026-05-12T17:53:06.743Z"},{"id":2,"isActive":true,"name":"Hacked Product","description":null,"price":"1.00","stock":0,"category":null,"createdAt":"2026-05-12T17:48:55.141Z","updatedAt":"2026-05-12T17:48:55.141Z"}],"meta":{"page":1,"pageSize":10,"total":6,"totalPages":1}},"statusCode":200,"timestamp":"2026-05-14T17:58:44.221Z"}
+### Тест пагінації
+
+
+StatusCode        : 200
+StatusDescription : OK
+Content           : {"data":{"items":[{"id":7,"isActive":true
+                    ,"name":"MacBook Air M4","description":nu
+                    ll,"price":"1299.99","stock":5,"category"
+                    :null,"createdAt":"2026-05-14T17:20:10.02
+                    0Z","updatedAt":"2026-05-14T17:20:10...
+RawContent        : HTTP/1.1 200 OK
+                    Connection: keep-alive
+                    Keep-Alive: timeout=5
+                    Content-Length: 1067
+                    Content-Type: application/json; charset=u
+                    tf-8
+                    Date: Thu, 14 May 2026 17:58:37 GMT
+                    ETag: W/"42b-h4kPfDFxrz45QIy6i...
+Forms             : {}
+Headers           : {[Connection, keep-alive], [Keep-Alive, t
+                    imeout=5], [Content-Length, 1067], [Conte
+                    nt-Type, application/json; charset=utf-8]
+                    ...}
+Images            : {}
+InputFields       : {}
+Links             : {}
+ParsedHtml        : System.__ComObject
+RawContentLength  : 1067
+
+
+### Тест фільтрації
+StatusCode        : 200
+StatusDescription : OK
+Content           : {"data":{"items":[],"meta":{"page":1,"pag
+                    eSize":10,"total":0,"totalPages":0}},"sta
+                    tusCode":200,"timestamp":"2026-05-14T17:5
+                    9:48.419Z"}
+RawContent        : HTTP/1.1 200 OK
+                    Connection: keep-alive
+                    Keep-Alive: timeout=5
+                    Content-Length: 134
+                    Content-Type: application/json; charset=u
+                    tf-8
+                    Date: Thu, 14 May 2026 17:59:48 GMT
+                    ETag: W/"86-X449/3vAPdGat18nuiO...
+Forms             : {}
+Headers           : {[Connection, keep-alive], [Keep-Alive, t
+                    imeout=5], [Content-Length, 134], [Conten
+                    t-Type, application/json; charset=utf-8].
+                    ..}
+Images            : {}
+InputFields       : {}
+Links             : {}
+ParsedHtml        : System.__ComObject
+RawContentLength  : 134
+
+### Поиск
+
+
+StatusCode        : 200
+StatusDescription : OK
+Content           : {"data":{"items":[{"id":7,"isActive":true
+                    ,"name":"MacBook Air M4","description":nu
+                    ll,"price":"1299.99","stock":5,"category"
+                    :null,"createdAt":"2026-05-14T17:20:10.02
+                    0Z","updatedAt":"2026-05-14T17:20:10...
+RawContent        : HTTP/1.1 200 OK
+                    Connection: keep-alive
+                    Keep-Alive: timeout=5
+                    Content-Length: 701
+                    Content-Type: application/json; charset=u
+                    tf-8
+                    Date: Thu, 14 May 2026 18:00:04 GMT
+                    ETag: W/"2bd-iMVKzDMiJpvLr0/Fqs...
+Forms             : {}
+Headers           : {[Connection, keep-alive], [Keep-Alive, t
+                    imeout=5], [Content-Length, 701], [Conten
+                    t-Type, application/json; charset=utf-8].
+                    ..}
+Images            : {}
+InputFields       : {}
+Links             : {}
+ParsedHtml        : System.__ComObject
+RawContentLength  : 701
+
+### Redis кеш
+PS C:\Users\admin\Desktop\v_m_p_practice1\v_m_p_1> docker compose exec redis redis-cli KEYS "products:*"
+(empty array)
 
 ## Student
 - Name: Горбань Анастасія Сергіївна
