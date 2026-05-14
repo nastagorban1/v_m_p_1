@@ -9,7 +9,8 @@ import {
   ParseIntPipe,
   UseGuards,
 } from '@nestjs/common';
-
+import {  Query } from '@nestjs/common';
+import { ProductQueryDto } from './dto/product-query.dto';
 import {
   ApiTags,
   ApiOperation,
@@ -34,9 +35,11 @@ export class ProductsController {
   @Get()
   @ApiOperation({ summary: 'Отримати всі продукти' })
   @ApiResponse({ status: 200, description: 'Список продуктів' })
-  findAll() {
-    return this.productsService.findAll();
-  }
+ @Get()
+
+findAll(@Query() query: ProductQueryDto) {
+  return this.productsService.findAll(query);
+}
 
   // PUBLIC
   @Get(':id')

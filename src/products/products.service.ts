@@ -1,23 +1,116 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  Inject,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Product } from './product.entity';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
+import { ProductQueryDto } from './dto/product-query.dto';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import type { Cache } from 'cache-manager';
 
 @Injectable()
 export class ProductsService {
   constructor(
     @InjectRepository(Product)
-    private readonly productRepo: Repository<Product>,
+    private productRepo: Repository<Product>,
+
+    @Inject(CACHE_MANAGER)
+    private cacheManager: any,
   ) {}
 
-  async findAll(): Promise<Product[]> {
-    return this.productRepo.find({
-      relations: ['category'],
-    });
+  
+  private async clearCache() {
+    const keys = await this.cacheManager.store.keys('products:*');
+
+    if (keys.length) {
+      await Promise.all(
+        keys.map((key) => this.cacheManager.del(key)),
+      );
+    }
   }
 
+  // =========================
+  // GET ALL (WITH CACHE + QUERY)
+  // =========================
+  async findAll(query: ProductQueryDto) {
+    const {
+      page = 1,
+      pageSize = 10,
+      sort = 'createdAt',
+      order = 'desc',
+      categoryId,
+      minPrice,
+      maxPrice,
+      search,
+    } = query;
+
+    // SAFE CACHE KEY (стабільний)
+    const cacheKey = `products:${page}:${pageSize}:${sort}:${order}:${
+      categoryId ?? ''
+    }:${minPrice ?? ''}:${maxPrice ?? ''}:${search ?? ''}`;
+
+    const cached = await this.cacheManager.get(cacheKey);
+    if (cached) return cached;
+
+    const qb = this.productRepo
+      .createQueryBuilder('product')
+      .leftJoinAndSelect('product.category', 'category');
+
+    if (categoryId) {
+      qb.andWhere('category.id = :categoryId', { categoryId });
+    }
+
+    if (minPrice !== undefined) {
+      qb.andWhere('product.price >= :minPrice', { minPrice });
+    }
+
+    if (maxPrice !== undefined) {
+      qb.andWhere('product.price <= :maxPrice', { maxPrice });
+    }
+
+    if (search) {
+      qb.andWhere('product.name ILIKE :search', {
+        search: `%${search}%`,
+      });
+    }
+
+    // SAFE SORT (whitelist)
+    const allowedSort = ['name', 'price', 'stock', 'createdAt'];
+    const safeSort = allowedSort.includes(sort)
+      ? sort
+      : 'createdAt';
+
+    qb.orderBy(
+      `product.${safeSort}`,
+      order.toUpperCase() === 'ASC' ? 'ASC' : 'DESC',
+    );
+
+    qb.skip((page - 1) * pageSize).take(pageSize);
+
+    const [items, total] = await qb.getManyAndCount();
+
+    const result = {
+      items,
+      meta: {
+        page,
+        pageSize,
+        total,
+        totalPages: Math.ceil(total / pageSize),
+      },
+    };
+
+    await this.cacheManager.set(cacheKey, result, 60000); // 60 sec
+
+    return result;
+  }
+
+  // =========================
+  // GET ONE
+  // =========================
   async findOne(id: number): Promise<Product> {
     const product = await this.productRepo.findOne({
       where: { id },
@@ -31,6 +124,9 @@ export class ProductsService {
     return product;
   }
 
+  // =========================
+  // CREATE
+  // =========================
   async create(dto: CreateProductDto): Promise<Product> {
     const product = this.productRepo.create({
       name: dto.name,
@@ -42,9 +138,16 @@ export class ProductsService {
         : undefined,
     });
 
-    return this.productRepo.save(product);
+    const saved = await this.productRepo.save(product);
+
+    await this.clearCache(); // ✅ важливо
+
+    return saved;
   }
 
+  // =========================
+  // UPDATE
+  // =========================
   async update(
     id: number,
     dto: UpdateProductDto,
@@ -52,7 +155,8 @@ export class ProductsService {
     const product = await this.findOne(id);
 
     if (dto.name !== undefined) product.name = dto.name;
-    if (dto.description !== undefined) product.description = dto.description;
+    if (dto.description !== undefined)
+      product.description = dto.description;
     if (dto.price !== undefined) product.price = dto.price;
     if (dto.stock !== undefined) product.stock = dto.stock;
 
@@ -60,11 +164,21 @@ export class ProductsService {
       product.category = { id: dto.categoryId } as any;
     }
 
-    return this.productRepo.save(product);
+    const saved = await this.productRepo.save(product);
+
+    await this.clearCache(); // ✅ важливо
+
+    return saved;
   }
 
+  // =========================
+  // DELETE
+  // =========================
   async remove(id: number): Promise<void> {
     const product = await this.findOne(id);
+
     await this.productRepo.remove(product);
+
+    await this.clearCache(); // ✅ важливо
   }
 }
