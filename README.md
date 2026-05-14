@@ -1,4 +1,145 @@
 
+## Student
+- Name: Горбань Анастасія Сергіївна
+- 232.1
+
+## Практична 6. Interceptors + Exception Filters + Swagger
+
+### Структура репозиторію
+```
+.
+├── src/
+│   ├── auth/ ...
+│   ├── users/ ...
+│   ├── categories/ ...
+│   ├── products/ ...
+│   ├── common/
+│   │   ├── enums/
+│   │   │   └── role.enum.ts
+│   │   ├── guards/
+│   │   │   ├── jwt-auth.guard.ts
+│   │   │   └── roles.guard.ts
+│   │   ├── decorators/
+│   │   │   ├── current-user.decorator.ts
+│   │   │   └── roles.decorator.ts
+│   │   ├── interceptors/
+│   │   │   ├── logging.interceptor.ts
+│   │   │   └── transform.interceptor.ts
+│   │   ├── filters/
+│   │   │   └── http-exception.filter.ts
+│   │   └── pipes/
+│   │   	└── trim.pipe.ts
+│   ├── migrations/
+│   ├── main.ts
+│   └── app.module.ts
+├── swagger-screenshot.png
+├── Dockerfile
+├── docker-compose.yml
+└── README.md
+```
+### Запуск проекту
+
+cp .env.example .env
+docker compose up --build
+ 
+### Swagger UI
+http://localhost:3000/api/docs
+
+![Swagger UI](swagger-screenshot.png)
+
+
+
+### Формат успішної відповіді
+
+{
+  "data": {
+    "id": 6,
+    "isActive": true,
+    "name": "MacBook Air M4",
+    "description": null,
+    "price": 1299.99,
+    "stock": 5,
+    "createdAt": "2026-05-14T17:18:41.055Z",
+    "updatedAt": "2026-05-14T17:18:41.055Z"
+  },
+  "statusCode": 201,
+  "timestamp": "2026-05-14T17:18:41.068Z"
+}
+ 
+### Формат помилки
+
+{
+  "error": {
+    "code": 400,
+    "message": "Bad control character in string literal in JSON at position 28",
+    "traceId": "a5d33258-5175-450e-a5f1-ad41b4e836f0"
+  },
+  "timestamp": "2026-05-14T17:19:34.624Z"
+}
+
+### Приклад логів (LoggingInterceptor)
+
+
+StatusCode        : 200
+StatusDescription : OK
+Content           : {"data":[{"id":2,"isActive":true,"name":"
+                    Hacked Product","description":null,"price
+                    ":"1.00","stock":0,"category":null,"creat
+                    edAt":"2026-05-12T17:48:55.141Z","updated
+                    At":"2026-05-12T17:48:55.141Z"},{"id...
+RawContent        : HTTP/1.1 200 OK
+                    Connection: keep-alive
+                    Keep-Alive: timeout=5
+                    Content-Length: 1188
+                    Content-Type: application/json; charset=u
+                    tf-8
+                    Date: Thu, 14 May 2026 17:20:33 GMT
+                    ETag: W/"4a4-2XzJg9ROAejsUt7sv...
+Forms             : {}
+Headers           : {[Connection, keep-alive], [Keep-Alive, t
+                    imeout=5], [Content-Length, 1188], [Conte
+                    nt-Type, application/json; charset=utf-8]
+                    ...}
+Images            : {}
+InputFields       : {}
+Links             : {}
+ParsedHtml        : System.__ComObject
+RawContentLength  : 1188
+
+
+
+solver] AuthController {/auth}: +0ms
+app-1  | [Nest] 18  - 05/14/2026, 5:17:54 PM     LOG [RouterExplorer] Mapped {/auth/register, POST} route +1ms
+app-1  | [Nest] 18  - 05/14/2026, 5:17:54 PM     LOG [RouterExplorer] Mapped {/auth/login, POST} route +0ms
+app-1  | [Nest] 18  - 05/14/2026, 5:17:54 PM     LOG [RoutesResolver] CategoriesController {/api/categories}: +0ms
+app-1  | [Nest] 18  - 05/14/2026, 5:17:54 PM     LOG [RouterExplorer] Mapped {/api/categories, GET} route +1ms
+app-1  | [Nest] 18  - 05/14/2026, 5:17:54 PM     LOG [RouterExplorer] Mapped {/api/categories/:id, GET} route +1ms
+app-1  | [Nest] 18  - 05/14/2026, 5:17:54 PM     LOG [RouterExplorer] Mapped {/api/categories, POST} route +1ms
+app-1  | [Nest] 18  - 05/14/2026, 5:17:54 PM     LOG [RouterExplorer] Mapped {/api/categories/:id, PATCH} route +1ms
+app-1  | [Nest] 18  - 05/14/2026, 5:17:54 PM     LOG [RouterExplorer] Mapped {/api/categories/:id, DELETE} route +1ms
+app-1  | [Nest] 18  - 05/14/2026, 5:17:54 PM     LOG [RoutesResolver] ProductsController {/api/products}: +0ms
+app-1  | [Nest] 18  - 05/14/2026, 5:17:54 PM     LOG [RouterExplorer] Mapped {/api/products, GET} route +1ms
+app-1  | [Nest] 18  - 05/14/2026, 5:17:54 PM     LOG [RouterExplorer] Mapped {/api/products/:id, GET} route +1ms
+app-1  | [Nest] 18  - 05/14/2026, 5:17:54 PM     LOG [RouterExplorer] Mapped {/api/products, POST} route +0ms
+app-1  | [Nest] 18  - 05/14/2026, 5:17:54 PM     LOG [RouterExplorer] Mapped {/api/products/:id, PATCH} route +1ms
+app-1  | [Nest] 18  - 05/14/2026, 5:17:54 PM     LOG [RouterExplorer] Mapped {/api/products/:id, DELETE} route +1ms
+app-1  | [Nest] 18  - 05/14/2026, 5:17:54 PM     LOG [NestApplication] Nest application successfully started +3ms
+app-1  | [Nest] 18  - 05/14/2026, 5:18:00 PM     LOG [HTTP] POST /auth/register — 201 — 189ms
+app-1  | [Nest] 18  - 05/14/2026, 5:18:12 PM     LOG [HTTP] POST /auth/login — 200 — 90ms
+app-1  | [Nest] 18  - 05/14/2026, 5:18:41 PM     LOG [HTTP] POST /api/products — 201 — 34ms
+app-1  | [Nest] 18  - 05/14/2026, 5:19:34 PM   ERROR [Exception] [a5d33258-5175-450e-a5f1-ad41b4e836f0] POST /api/products — 400 — Bad control character in string literal in JSON at position 28
+app-1  | [Nest] 18  - 05/14/2026, 5:20:10 PM     LOG [HTTP] POST /api/products — 201 — 33ms
+app-1  | [Nest] 18  - 05/14/2026, 5:20:33 PM     LOG [HTTP] GET /api/products — 200 — 21ms
+
+
+## Тест помилки з traceId
+
+curl http://localhost:3000/api/products/999
+curl : {"error":{"code":404,"message":"Product #999 not found
+","traceId":"d9037eaf-ea6d-4f5f-9ddc-9646452fca97"},"timestam
+p":"2026-05-14T17:22:00.329Z"}
+At line:1 char:1
++ curl http://localhost:3000/api/products/999
 
 ## Student
 - Name: Горбань Анастасія Сергіївна
