@@ -12,11 +12,11 @@ export class CreateProductDto {
   @IsString()
   @MinLength(2)
   @MaxLength(255)
-  name: string;
+  name!: string;
 
   @IsNumber({ maxDecimalPlaces: 2 })
   @Min(0.01)
-  price: number;
+  price!: number;
 
   @IsOptional()
   @IsString()
